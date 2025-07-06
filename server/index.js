@@ -1,66 +1,53 @@
-const express = require('express');
-const cors = require('cors');
-const admin = require('firebase-admin');
-const serviceAccount = require('./serviceAccountKey.json');
-const rateLimit = require('express-rate-limit');
+import express from 'express';
+import cors from 'cors';
+import admin from 'firebase-admin';
+import dotenv from 'dotenv';
 
-// Initialize Firebase
+// Load environment variables
+dotenv.config();
+
+// Initialize Firebase Admin
+const serviceAccount = {
+  type: process.env.FIREBASE_TYPE,
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_CLIENT_ID,
+  auth_uri: process.env.FIREBASE_AUTH_URI,
+  token_uri: process.env.FIREBASE_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER,
+  client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL
+};
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://pesananonim-9666e.firebaseio.com"
+  databaseURL: `https://${process.env.FIREBASE_PROJECT_ID}.firebaseio.com`
 });
 
 const db = admin.firestore();
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Rate limiting (100 requests per 15 minutes)
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: 'Terlalu banyak permintaan. Coba lagi nanti.'
-});
+// Enhanced CORS configuration
+app.use(cors({
+  origin: [
+    'https://pesananonim-*.vercel.app',
+    'https://pesananonim-db9hw4wki-naufal-maulanas-projects-f8354363.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
+}));
 
-// Middleware
-app.use(cors());
 app.use(express.json());
-app.use(express.static('../public'));
-app.use(limiter);
 
-// API Endpoints
-app.post('/api/messages', async (req, res) => {
-  try {
-    const { message } = req.body;
-    
-    if (!message || typeof message !== 'string') {
-      return res.status(400).json({ error: 'Pesan harus berupa teks' });
-    }
-    
-    if (message.length > 500) {
-      return res.status(400).json({ error: 'Pesan maksimal 500 karakter' });
-    }
-
-    const newMessage = {
-      message: message.trim(),
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      ip: req.ip // Untuk deteksi spam
-    };
-
-    await db.collection('messages').add(newMessage);
-    res.status(201).json({ success: true });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Terjadi kesalahan' });
-  }
-});
-
+// API Endpoints with improved error handling
 app.get('/api/messages', async (req, res) => {
   try {
     const snapshot = await db.collection('messages')
       .orderBy('createdAt', 'desc')
       .limit(100)
       .get();
-    
+
     const messages = [];
     snapshot.forEach(doc => {
       messages.push({
@@ -71,20 +58,62 @@ app.get('/api/messages', async (req, res) => {
 
     res.json(messages);
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Gagal memuat pesan' });
+    console.error('Firestore Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to load messages',
+      details: error.message
+    });
   }
 });
 
-// Error handling
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Terjadi kesalahan server' });
+app.post('/api/messages', async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'Message must be a string'
+      });
+    }
+
+    if (message.length > 500) {
+      return res.status(400).json({
+        success: false,
+        error: 'Message too long (max 500 chars)'
+      });
+    }
+
+    const newMessage = {
+      message: message.trim(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      ip: req.ip
+    };
+
+    const docRef = await db.collection('messages').add(newMessage);
+    
+    res.status(201).json({
+      success: true,
+      id: docRef.id
+    });
+  } catch (error) {
+    console.error('Firestore Error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to send message',
+      details: error.message
+    });
+  }
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date() });
+});
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server berjalan di port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Firebase connected to project: ${process.env.FIREBASE_PROJECT_ID}`);
 });
-
-console.log("Environment:", process.env.NODE_ENV);
-console.log("Public Path:", path.join(__dirname, '../public'));
