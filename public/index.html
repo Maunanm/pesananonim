@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pesan Rahasia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-secret"></i> Papan Pesan Rahasia</h1>
+      <p class="subtitle">Sampaikan pesanmu tanpa nama</p>
+    </header>
+    
+    <div class="message-form">
+      <div class="form-group">
+        <textarea id="messageInput" placeholder="Tulis pesan rahasia..."></textarea>
+        <div class="char-counter"><span id="charCount">0</span>/500</div>
+      </div>
+      <button id="sendButton" class="btn-primary">
+        <i class="fas fa-paper-plane"></i> Kirim
+      </button>
+    </div>
+    
+    <div class="message-history">
+      <h2><i class="fas fa-history"></i> Riwayat Pesan</h2>
+      <div class="filter-controls">
+        <input type="text" id="searchInput" placeholder="Cari pesan...">
+        <select id="sortSelect">
+          <option value="newest">Terbaru</option>
+          <option value="oldest">Terlama</option>
+        </select>
+      </div>
+      <div class="messages" id="messagesContainer">
+        <!-- Pesan akan muncul di sini -->
+      </div>
+      <div class="pagination">
+        <button id="prevPage" disabled><i class="fas fa-chevron-left"></i></button>
+        <span id="pageInfo">Halaman 1</span>
+        <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+  
+  <footer>
+    <p>Semua pesan bersifat anonim. Harap bijak dalam berkomentar.</p>
+  </footer>
+  
+  <script src="script.js"></script>
+</body>
+</html>
