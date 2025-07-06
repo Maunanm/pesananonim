@@ -1,20 +1,33 @@
 {
-  "name": "pesananonim",
-  "version": "1.0.0",
-  "main": "server/index.js",
-  "type": "module",
-  "scripts": {
-    "start": "node server/index.js",
-    "vercel-build": "npm install && echo 'Build completed'",
-    "dev": "nodemon server/index.js"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "express-rate-limit": "^7.5.1",
-    "firebase-admin": "^13.4.0"
-  },
-  "engines": {
-    "node": ">=18.x"
-  }
+    "name": "anonymous-message-board",
+    "version": "1.0.0",
+    "description": "Anonymous message website with Firebase and Node.js",
+    "main": "server/index.js",
+    "scripts": {
+        "start": "node server/index.js",
+        "dev": "nodemon server/index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "engines": {
+        "node": ">=16.0.0",
+        "npm": ">=8.0.0"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "firebase-admin": "^11.11.0",
+        "express-rate-limit": "^6.7.0",
+        "dotenv": "^16.3.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.2"
+    },
+    "keywords": [
+        "anonymous",
+        "message",
+        "firebase",
+        "nodejs"
+    ],
+    "author": "Your Name",
+    "license": "MIT"
 }
