@@ -49,12 +49,15 @@ app.get('/api/messages', async (req, res) => {
       .get();
 
     const messages = [];
-    snapshot.forEach(doc => {
+     snapshot.forEach((doc) => {
+      // Perbaikan: Gunakan doc.data() langsung
+      const messageData = doc.data();
       messages.push({
         id: doc.id,
-        message: data.message,
-        // Konversi Timestamp ke ISO string
-        createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString()
+        message: messageData.message,
+        createdAt: messageData.createdAt 
+          ? messageData.createdAt.toDate().toISOString() 
+          : new Date().toISOString()
       });
     });
 
