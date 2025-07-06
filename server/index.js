@@ -94,10 +94,13 @@ app.post('/api/messages', async (req, res) => {
     };
 
     const docRef = await db.collection('messages').add(newMessage);
+    const doc = await docRef.get();
     
     res.status(201).json({
       success: true,
-      id: docRef.id
+      id: doc.id,
+      message: doc.data().message,
+      createdAt: doc.data().createdAt.toDate().toISOString()
     });
   } catch (error) {
     console.error('Firestore Error:', error);
