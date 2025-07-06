@@ -85,3 +85,6 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server berjalan di port ${PORT}`);
 });
+
+console.log("Environment:", process.env.NODE_ENV);
+console.log("Public Path:", path.join(__dirname, '../public'));
