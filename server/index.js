@@ -52,7 +52,9 @@ app.get('/api/messages', async (req, res) => {
     snapshot.forEach(doc => {
       messages.push({
         id: doc.id,
-        ...doc.data()
+        message: data.message,
+        // Konversi Timestamp ke ISO string
+        createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString()
       });
     });
 
