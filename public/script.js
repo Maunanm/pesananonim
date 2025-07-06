@@ -106,15 +106,20 @@ function renderMessages() {
 function formatFirestoreTimestamp(timestamp) {
   if (!timestamp) return 'Just now';
   
-  const date = timestamp.toDate();
-  return date.toLocaleString('id-ID', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  try {
+    const date = new Date(timestamp);
+    return date.toLocaleString('id-ID', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error('Invalid timestamp:', timestamp);
+    return 'Unknown time';
+  }
 }
 
 function showNotification(message, type) {
