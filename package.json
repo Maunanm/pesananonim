@@ -1,18 +1,20 @@
 {
   "name": "pesananonim",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/index.js",
+    "vercel-build": "npm install && echo 'Build completed'",
+    "dev": "nodemon server/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.1",
     "firebase-admin": "^13.4.0"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
